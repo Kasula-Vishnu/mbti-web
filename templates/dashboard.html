@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Dashboard</title>
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@2.18.1/dist/full.css" rel="stylesheet" type="text/css" />
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  </head>
+  <body class="absolute h-screen w-screen">  
+      <div class="absolute z-50 top-0 w-full h-16 flex items-center justify-center bg-white px-5">
+        <p class="text-xl font-bold">
+          Personality Test
+        </p>
+        <div class="flex-grow"></div>
+        <a href="{{url_for('logout')}}" class="px-4 py-2 rounded-full bg-black text-white text-sm font-bold">Log out</a>
+      </div>
+      <div class="absolute flex flex-col items-center justify-center h-full w-full bg-gradient-to-r from-indigo-300 to-purple-400">
+          <form method="post" id="prediction-form" action="/predict" class="w-2/3 h-fit py-7 px-5 glass rounded-lg flex flex-col items-center justify-center gap-5">
+            <div class="px-5 w-full">
+              <p id="question" class="text-lg font-semibold"></p>
+            </div>
+            <div class="px-5 w-full">
+              <textarea id="answer" class="textarea w-full h-40 focus:outline-none" placeholder="Justify your answer...."></textarea>
+            </div>
+            <div class="flex w-full items-center justify-center px-5">
+              <button type="button" id="prev" class="px-4 py-2 glass text-black font-bold text-sm rounded-full">Prev</button>
+              <div class="flex-grow"></div>
+              <button type="button" id="next" class="px-4 py-2 glass text-black font-bold text-sm rounded-full">Next</button>
+            </div>
+          </form>
+          
+      </div>
+      <!--
+      <h1> PERSONALITY DETECTION </h1><br>
+        <div class="cover">
+      <form method="POST" action="/predict">
+          <p><h3>1. Do you prefer to focus on the outer world or on your own inner world?</h3></p><br>
+          <textarea style="text-align: left;"class="w3review" name='prediction_text1' rows="5" cols="80" placeholder="Justify Your Answer...."></textarea><br><br>
+          <p><h3>2. Do you prefer to focus on the basic information you take in or do you prefer to interpret and add meaning?</h3></p><br>
+          <textarea style="text-align: left;" class="w3review" name='prediction_text2' rows="5" cols="80" placeholder="Justify Your Answer...."></textarea><br><br>
+          <p><h3>3. When making decisions, do you prefer to first look at logic and consistency or first look at the people and special circumstances?</h3></p><br>
+          <textarea style="text-align: left;" class="w3review" name='prediction_text3' rows="5" cols="80" placeholder="Justify Your Answer...."></textarea><br><br>
+          <p><h3>4. In dealing with the outside world, do you prefer to get things decided or do you prefer to stay open to new information and options?</h3></p><br>
+          <textarea style="text-align: left;padding: 1px;" class="w3review" name='prediction_text4' rows="5" cols="80" placeholder="Justify Your Answer...."></textarea><br><br>
+              
+          
+          
+        <br>
+        <div class="posdff">
+          <button class="favorite styled " >
+                  PREDICT
+              </button>
+            </div>
+      </form>
+      
+    </div>  
+    
+    
+        
+      <a class="logout" href="{{url_for('logout')}}"><span style="text-decoration:none ;color:#fff">Press here to logout</span></a>
+    -->
+  </body>
+  <script>
+    let form = document.getElementById("prediction-form");
+    let questions = [
+      "Do you prefer to focus on the outer world or on your own inner world?",
+      "Do you prefer to focus on the basic information you take in or do you prefer to interpret and add meaning?",
+      "When making decisions, do you prefer to first look at logic and consistency or first look at the people and special circumstances?",
+      "In dealing with the outside world, do you prefer to get things decided or do you prefer to stay open to new information and options?"
+    ]
+    let answers = ["", "", "", ""]
+    var currentQuestion = 0;
+    var question = document.getElementById("question")
+    var answer = document.getElementById("answer")
+    let next = document.getElementById("next")
+    next.classList.add('btn-disabled')
+    let prev = document.getElementById("prev")
+    prev.classList.add('btn-disabled')
+
+    question.innerText = questions[currentQuestion];
+    answer.oninput = (_e) => {
+      console.log(answer.value.length > 0)
+      if (answer.value.length > 0 && currentQuestion < questions.length)  {
+        next.classList.remove('btn-disabled')
+      }else{
+        next.classList.add('btn-disabled')
+      }
+    }
+    next.addEventListener("click", ()=>{
+      answers[currentQuestion] = answer.value
+      answer.value = ""
+      if (currentQuestion >= 3) {
+        answers.forEach((answer, index) => {
+          let input = document.createElement("input");
+          input.type = "hidden"
+          input.name = `answer_${index}`
+          input.value = answer
+          form.appendChild(input)
+        })
+        form.submit();
+      }else{
+        prev.classList.remove('btn-disabled')
+        currentQuestion += 1;
+        question.innerText = questions[currentQuestion];
+      }
+      next.classList.add('btn-disabled')
+    })
+    prev.addEventListener("click", ()=>{
+      currentQuestion -= 1
+      question.innerText = questions[currentQuestion];
+      answer.value = answers[currentQuestion]
+      if (currentQuestion < 1) {
+        prev.classList.add('btn-disabled')
+      }
+      if (answer.value.length > 0 && currentQuestion < questions.length-1)  {
+        next.classList.remove('btn-disabled')
+      }else{
+        next.classList.add('btn-disabled')
+      }
+    })
+  </script>
+</html>
